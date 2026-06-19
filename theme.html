@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>主题分类页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+    --bg:#fafafa;
+    --card-bg:#fff;
+    --primary:#2c3e50;
+    --accent:#e74c3c;
+    --text:#333;
+    --muted:#777;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    padding:1rem;
+}
+h1{
+    text-align:center;
+    margin:1rem 0;
+    color:var(--primary);
+}
+#cloud{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:0.8rem;
+    margin:1rem 0;
+}
+.tag{
+    display:inline-block;
+    padding:0.4rem 0.8rem;
+    border-radius:20px;
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+    transition:transform .2s,background .2s;
+    font-size:0.9rem;
+}
+.tag:hover{
+    transform:scale(1.1);
+    background:#c0392b;
+}
+#controls{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:0.5rem;
+    margin:1rem 0;
+}
+select,button{
+    padding:0.4rem 0.8rem;
+    border:1px solid #ccc;
+    border-radius:4px;
+    background:#fff;
+    cursor:pointer;
+}
+button{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+}
+button:disabled{
+    background:#aaa;
+    cursor:not-allowed;
+}
+#poem-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:1rem;
+    margin-top:1rem;
+}
+.card{
+    background:var(--card-bg);
+    border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    padding:1rem;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+.card h3{
+    margin-bottom:0.5rem;
+    color:var(--primary);
+    font-size:1.1rem;
+}
+.card p{
+    flex-grow:1;
+    margin-bottom:0.5rem;
+    color:var(--muted);
+}
+.card .author{
+    font-size:0.9rem;
+    text-align:right;
+    color:var(--primary);
+}
+#pagination{
+    display:flex;
+    justify-content:center;
+    gap:0.5rem;
+    margin:1.5rem 0;
+}
+.page-btn{
+    padding:0.4rem 0.8rem;
+    border:1px solid var(--accent);
+    border-radius:4px;
+    background:#fff;
+    color:var(--accent);
+    cursor:pointer;
+}
+.page-btn.active{
+    background:var(--accent);
+    color:#fff;
+}
+@media (max-width:600px){
+    .tag{font-size:0.8rem;}
+    #poem-list{grid-template-columns:1fr;}
+}
+</style>
+<meta name="description" content="以主题词云形式呈现，如思乡、爱国、山水等，点击主题后展示该主题下的诗词卡片列表，支持分页和排序。"><meta name="keywords" content="古诗词,Web应用,诗词检索,诗词解析,古典文学,朝代筛选,作者分类,主题搜索"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:type" content="website"><meta property="og:title" content="主题分类页"><meta property="og:description" content="以主题词云形式呈现，如思乡、爱国、山水等，点击主题后展示该主题下的诗词卡片列表，支持分页和排序。"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="主题分类页"><meta name="twitter:description" content="以主题词云形式呈现，如思乡、爱国、山水等，点击主题后展示该主题下的诗词卡片列表，支持分页和排序。"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"主题分类页","description":"以主题词云形式呈现，如思乡、爱国、山水等，点击主题后展示该主题下的诗词卡片列表，支持分页和排序。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script></head>
+<body>
+<h1>古诗词主题分类</h1>
+<div id="cloud"></div>
+
+<div id="controls" style="display:none;">
+    <label>排序:
+        <select id="sortSelect">
+            <option value="default">默认</option>
+            <option value="title">标题</option>
+            <option value="author">作者</option>
+        </select>
+    </label>
+    <button id="prevBtn">上一页</button>
+    <span id="pageInfo"></span>
+    <button id="nextBtn">下一页</button>
+</div>
+
+<div id="poem-list"></div>
+
+<script>
+const themes = [
+    {name:"思乡",weight:30},
+    {name:"爱国",weight:25},
+    {name:"山水",weight:28},
+    {name:"田园",weight:20},
+    {name:"友情",weight:18},
+    {name:"离别",weight:22},
+    {name:"春天",weight:24},
+    {name:"秋天",weight:19},
+    {name:"人生",weight:26},
+    {name:"哲理",weight:21}
+];
+
+// 模拟后端数据
+const mockPoems = {
+    "思乡":[
+        {title:"静夜思",author:"李白",content:"床前明月光，疑是地上霜。举头望明月，低头思故乡。"},
+        {title:"枫桥夜泊",author:"张继",content:"月落乌啼霜满天，江枫渔火对愁眠。"},
+        {title:"九月九日忆山东兄弟",author:"王维",content:"独在异乡为异客，每逢佳节倍思亲。"},
+        {title:"黄鹤楼送孟浩然之广陵",author:"李白",content:"故人西辞黄鹤楼，烟花三月下扬州。"},
+        {title:"春望",author:"杜甫",content:"国破山河在，城春草木深。"}
+    ],
+    "爱国":[
+        {title:"满江红·写怀",author:"岳飞",content:"怒发冲冠，凭栏处、潇潇雨歇。"},
+        {title:"过零丁洋",author:"文天祥",content:"人生自古谁无死，留取丹心照汗青。"},
+        {title:"七律·到韶山",author:"毛泽东",content:"红旗漫卷西风烈，百战归来不敢忘。"},
+        {title:"七绝·登鹳雀楼",author:"王之涣",content:"白日依山尽，黄河入海流。"},
+        {title:"七言·咏史",author:"杜甫",content:"国破山河在，城春草木深。"}
+    ],
+    "山水":[
+        {title:"望庐山瀑布",author:"李白",content:"日照香炉生紫烟，遥看瀑布挂前川。"},
+        {title:"早发白帝彩云间",author:"李白",content:"朝辞白帝彩云间，千里江陵一日还。"},
+        {title:"山居秋暝",author:"王维",content:"空山新雨后，天气晚来秋。"},
+        {title:"江雪",author:"柳宗元",content:"千山鸟飞绝，万径人踪灭。"},
+        {title:"黄鹤楼送孟浩然",author:"李白",content:"故人西辞黄鹤楼，烟花三月下扬州。"}
+    ],
+    // 其它主题使用相同示例数据
+};
+function getPoemsByTheme(theme){
+    return mockPoems[theme]||[
+        {title:"示例诗篇",author:"作者",content:"这里是诗词内容。"},
+        {title:"示例诗篇二",author:"作者二",content:"这里是另一首诗词内容。"},
+        {title:"示例诗篇三",author:"作者三",content:"更多诗词内容展示。"},
+        {title:"示例诗篇四",author:"作者四",content:"继续展示诗词。"},
+        {title:"示例诗篇五",author:"作者五",content:"结束示例。"}
+    ];
+}
+
+// 渲染主题云
+const cloudDiv=document.getElementById('cloud');
+themes.forEach(t=>{
+    const span=document.createElement('span');
+    span.className='tag';
+    span.textContent=t.name;
+    const size=1+ t.weight/30; // 1~2倍
+    span.style.fontSize=`${size}rem`;
+    span.onclick=()=>loadTheme(t.name);
+    cloudDiv.appendChild(span);
+});
+
+let currentTheme='', currentPage=1, pageSize=5, currentList=[], currentSort='default';
+
+function loadTheme(theme){
+    currentTheme=theme;
+    currentPage=1;
+    currentList=getPoemsByTheme(theme);
+    applySort();
+    renderList();
+    document.getElementById('controls').style.display='flex';
+    document.getElementById('cloud').style.display='none';
+}
+
+function applySort(){
+    if(currentSort==='title'){
+        currentList.sort((a,b)=>a.title.localeCompare(b.title));
+    }else if(currentSort==='author'){
+        currentList.sort((a,b)=>a.author.localeCompare(b.author));
+    }
+}
+
+function renderList(){
+    const listDiv=document.getElementById('poem-list');
+    listDiv.innerHTML='';
+    const start=(currentPage-1)*pageSize;
+    const pageItems=currentList.slice(start,start+pageSize);
+    pageItems.forEach(p=>{
+        const card=document.createElement('div');
+        card.className='card';
+        const title=document.createElement('h3');
+        title.textContent=p.title;
+        const author=document.createElement('div');
+        author.className='author';
+        author.textContent='— '+p.author;
+        const content=document.createElement('p');
+        content.textContent=p.content;
+        card.appendChild(title);
+        card.appendChild(content);
+        card.appendChild(author);
+        listDiv.appendChild(card);
+    });
+    // pagination
+    const totalPages=Math.ceil(currentList.length/pageSize);
+    document.getElementById('pageInfo').textContent=`第 ${currentPage} 页 / 共 ${totalPages} 页`;
+    document.getElementById('prevBtn').disabled=currentPage===1;
+    document.getElementById('nextBtn').disabled=currentPage===totalPages;
+}
+
+// pagination controls
+document.getElementById('prevBtn').onclick=()=>{if(currentPage>1){currentPage--;renderList();}};
+document.getElementById('nextBtn').onclick=()=>{if(currentPage<Math.ceil(currentList.length/pageSize)){currentPage++;renderList();}};
+
+// sort control
+document.getElementById('sortSelect').onchange=e=>{
+    currentSort=e.target.value;
+    applySort();
+    renderList();
+};
+</script>
+</body>
+</html>
