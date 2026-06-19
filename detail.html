@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>诗词详情页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+/* 基础布局 */
+body{margin:0;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:#f5f5f5;color:#333;line-height:1.6;}
+a{color:#1e88e5;text-decoration:none;}
+a:hover{text-decoration:underline;}
+.container{max-width:800px;margin:0 auto;padding:20px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.title{font-size:1.8em;font-weight:bold;}
+.back{font-size:0.9em;color:#666;}
+.back:hover{color:#000;}
+.poem{margin:20px 0;padding:15px;background:#fafafa;border-left:4px solid #1e88e5;}
+.poem p{margin:0 0 .8em;}
+.annotation,.analysis,.background{margin-top:20px;}
+.section-title{font-size:1.2em;margin-bottom:10px;color:#1e88e5;}
+.btn-group{display:flex;gap:10px;margin-top:15px;}
+.btn{flex:1;padding:8px 12px;background:#1e88e5;color:#fff;border:none;border-radius:4px;font-size:0.9em;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.btn:hover{background:#1565c0;}
+.btn svg{margin-right:5px;width:16px;height:16px;fill:#fff;}
+.img-wrapper{margin:20px 0;text-align:center;}
+.img-wrapper img{max-width:100%;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+@media(max-width:600px){
+  .title{font-size:1.5em;}
+  .header{flex-direction:column;align-items:flex-start;}
+  .back{margin-top:5px;}
+}
+</style>
+<meta name="description" content="展示完整诗文、逐句译注、赏析、背景介绍和高清配图；提供复制、分享、收藏按钮以及返回列表的快捷链接。"><meta name="keywords" content="古诗词,Web应用,诗词检索,诗词解析,古典文学,朝代筛选,作者分类,主题搜索"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:type" content="website"><meta property="og:title" content="诗词详情页"><meta property="og:description" content="展示完整诗文、逐句译注、赏析、背景介绍和高清配图；提供复制、分享、收藏按钮以及返回列表的快捷链接。"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="诗词详情页"><meta name="twitter:description" content="展示完整诗文、逐句译注、赏析、背景介绍和高清配图；提供复制、分享、收藏按钮以及返回列表的快捷链接。"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"诗词详情页","description":"展示完整诗文、逐句译注、赏析、背景介绍和高清配图；提供复制、分享、收藏按钮以及返回列表的快捷链接。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script></head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">静夜思</div>
+    <a class="back" href="javascript:history.back()">← 返回列表</a>
+  </div>
+
+  <div class="poem">
+    <p>床前明月光，</p>
+    <p>疑是地上霜。</p>
+    <p>举头望明月，</p>
+    <p>低头思故乡。</p>
+  </div>
+
+  <div class="annotation">
+    <div class="section-title">逐句译注</div>
+    <p>床前的明月光，<br>好像地上的白霜。</p>
+    <p>抬头仰望明月，<br>低头思念故乡。</p>
+  </div>
+
+  <div class="analysis">
+    <div class="section-title">赏析</div>
+    <p>全诗四句，语言简练却意境深远。首句点明环境——“床前明月光”，以光的清冷渲染夜的寂静；第二句“疑是地上霜”，以错觉强化光的洁白；第三、四句转入情感，抬头望月、低头思乡，形成鲜明的动作对比，表达了游子对故土的深切思念。</p>
+  </div>
+
+  <div class="background">
+    <div class="section-title">背景介绍</div>
+    <p>本诗出自唐代诗人李白的《静夜思》，创作于诗人漂泊他乡、思念家乡之时。全诗以月光为线索，借景抒情，成为千古传颂的思乡名篇。</p>
+  </div>
+
+  <div class="img-wrapper">
+    <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80" alt="夜月山水">
+  </div>
+
+  <div class="btn-group">
+    <button class="btn" id="copyBtn"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>复制</button>
+    <button class="btn" id="shareBtn"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.02-4.11c.54.5 1.25.81 2.07.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.07 9.81c-.54-.5-1.25-.81-2.07-.81-1.66 0-3 1.34-3 3s1.34 3 3 3c.82 0 1.53-.31 2.07-.81l7.02 4.11c-.05.22-.09.45-.09.68 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/></svg>分享</button>
+    <button class="btn" id="favBtn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>收藏</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const copyBtn=document.getElementById('copyBtn');
+  const shareBtn=document.getElementById('shareBtn');
+  const favBtn=document.getElementById('favBtn');
+  const poemText=`床前明月光，疑是地上霜。举头望明月，低头思故乡。`;
+
+  copyBtn.onclick=()=>{navigator.clipboard.writeText(poemText).then(()=>alert('已复制诗文'));};
+
+  shareBtn.onclick=()=>{if(navigator.share){navigator.share({title:'古诗词 - 静夜思',text:poemText,url:location.href}).catch(()=>{});}else{prompt('复制链接分享',location.href);}};
+
+  const STORAGE_KEY='fav_poems';
+  function updateFav(){
+    const favs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+    const isFav=favs.includes('静夜思');
+    favBtn.querySelector('svg').innerHTML=isFav?'<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>':'<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>';
+    favBtn.textContent=isFav?'已收藏':'收藏';
+    favBtn.prepend(favBtn.querySelector('svg'));
+  }
+  favBtn.onclick=()=>{
+    const favs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+    const idx=favs.indexOf('静夜思');
+    if(idx===-1){favs.push('静夜思');}else{favs.splice(idx,1);}
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(favs));
+    updateFav();
+  };
+  updateFav();
+})();
+</script>
+</body>
+</html>
