@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>首页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* Reset */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:#f5f5f5;color:#333;}
+a{text-decoration:none;color:inherit;}
+ul{list-style:none;}
+/* Header */
+header{background:#4a90e2;padding:1rem;text-align:center;color:#fff;}
+header h1{font-size:1.8rem;}
+/* Search */
+.search-bar{margin:1rem auto;max-width:600px;display:flex;}
+.search-bar input{flex:1;padding:0.5rem 1rem;border:1px solid #ccc;border-radius:4px 0 0 4px;font-size:1rem;}
+.search-bar button{padding:0.5rem 1rem;background:#4a90e2;color:#fff;border:none;border-radius:0 4px 4px 0;cursor:pointer;}
+.search-bar button:hover{background:#357ab8;}
+/* Carousel */
+.carousel{position:relative;overflow:hidden;width:100%;max-width:800px;margin:0 auto;}
+.carousel-track{display:flex;transition:transform .5s ease;}
+.carousel-card{min-width:100%;background:#fff;margin:0.5rem;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.1);overflow:hidden;cursor:pointer;}
+.carousel-card img{width:100%;height:180px;object-fit:cover;}
+.carousel-card .info{padding:0.8rem;}
+.carousel-card .info h3{margin-bottom:0.3rem;font-size:1.2rem;color:#333;}
+.carousel-card .info p{margin:0;color:#666;font-size:0.9rem;}
+.carousel-nav{position:absolute;top:50%;transform:translateY(-50%);width:100%;display:flex;justify-content:space-between;pointer-events:none;}
+.carousel-nav button{pointer-events:auto;background:rgba(0,0,0,0.4);border:none;color:#fff;font-size:1.5rem;padding:0.2rem 0.6rem;border-radius:50%;cursor:pointer;}
+.carousel-nav button:hover{background:rgba(0,0,0,0.6);}
+
+/* Quick Links */
+.quick-links{display:flex;flex-wrap:wrap;justify-content:center;margin:2rem 0;}
+.quick-links a{flex:1 1 120px;margin:0.5rem;background:#fff;padding:1rem;text-align:center;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1);transition:transform .2s;}
+.quick-links a:hover{transform:translateY(-3px);}
+
+/* Footer */
+footer{text-align:center;padding:1rem;color:#777;font-size:0.9rem;}
+
+/* Responsive */
+@media (max-width:600px){
+    .search-bar input,.search-bar button{font-size:0.9rem;}
+    .carousel-card img{height:120px;}
+}
+</style>
+<meta name="description" content="提供全局搜索框、轮播展示1‑20首精选诗词卡片，卡片显示标题、作者、配图并可点击进入详情；下方快捷入口分别指向朝代、作者、主题筛选页。"><meta name="keywords" content="古诗词,Web应用,诗词检索,诗词解析,古典文学,朝代筛选,作者分类,主题搜索"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:type" content="website"><meta property="og:title" content="首页"><meta property="og:description" content="提供全局搜索框、轮播展示1‑20首精选诗词卡片，卡片显示标题、作者、配图并可点击进入详情；下方快捷入口分别指向朝代、作者、主题筛选页。"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="首页"><meta name="twitter:description" content="提供全局搜索框、轮播展示1‑20首精选诗词卡片，卡片显示标题、作者、配图并可点击进入详情；下方快捷入口分别指向朝代、作者、主题筛选页。"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"首页","description":"提供全局搜索框、轮播展示1‑20首精选诗词卡片，卡片显示标题、作者、配图并可点击进入详情；下方快捷入口分别指向朝代、作者、主题筛选页。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script></head>
+<body>
+<header>
+    <h1>中国古诗词浏览与解析系统</h1>
+</header>
+
+<div class="search-bar">
+    <input type="text" id="searchInput" placeholder="搜索诗词、作者、主题...">
+    <button id="searchBtn">搜索</button>
+</div>
+
+<div class="carousel" id="carousel">
+    <div class="carousel-track" id="track">
+        <!-- 卡片将由 JS 动态生成 -->
+    </div>
+    <div class="carousel-nav">
+        <button id="prevBtn">&#9664;</button>
+        <button id="nextBtn">&#9654;</button>
+    </div>
+</div>
+
+<div class="quick-links">
+    <a href="#" id="dynastyLink">朝代筛选</a>
+    <a href="#" id="authorLink">作者筛选</a>
+    <a href="#" id="themeLink">主题筛选</a>
+</div>
+
+<footer>
+    © 2026 中国古诗词浏览与解析系统
+</footer>
+
+<script>
+// 示例数据（1-20首）
+const poems = [
+    {id:1,title:"静夜思",author:"李白",img:"https://picsum.photos/seed/1/800/400"},
+    {id:2,title:"春晓",author:"孟浩然",img:"https://picsum.photos/seed/2/800/400"},
+    {id:3,title:"登鹳雀楼",author:"王之涣",img:"https://picsum.photos/seed/3/800/400"},
+    {id:4,title:"黄鹤楼送孟浩然",author:"李白",img:"https://picsum.photos/seed/4/800/400"},
+    {id:5,title:"枫桥夜泊",author:"张继",img:"https://picsum.photos/seed/5/800/400"},
+    {id:6,title:"望庐山瀑布",author:"李白",img:"https://picsum.photos/seed/6/800/400"},
+    {id:7,title:"送元二使安西",author:"王维",img:"https://picsum.photos/seed/7/800/400"},
+    {id:8,title:"相思",author:"王维",img:"https://picsum.photos/seed/8/800/400"},
+    {id:9,title:"夜泊牛渚怀古",author:"杜甫",img:"https://picsum.photos/seed/9/800/400"},
+    {id:10,title:"春望",author:"杜甫",img:"https://picsum.photos/seed/10/800/400"},
+    {id:11,title:"九月九日忆山东兄弟",author:"王维",img:"https://picsum.photos/seed/11/800/400"},
+    {id:12,title:"早发白帝彩云间",author:"李白",img:"https://picsum.photos/seed/12/800/400"},
+    {id:13,title:"秋夜将晓出篱门迎凉有感",author:"陆游",img:"https://picsum.photos/seed/13/800/400"},
+    {id:14,title:"渔舟唱晚",author:"刘禹锡",img:"https://picsum.photos/seed/14/800/400"},
+    {id:15,title:"山居秋暝",author:"王维",img:"https://picsum.photos/seed/15/800/400"},
+    {id:16,title:"江雪",author:"柳宗元",img:"https://picsum.photos/seed/16/800/400"},
+    {id:17,title:"春夜喜雨",author:"杜甫",img:"https://picsum.photos/seed/17/800/400"},
+    {id:18,title:"竹里馆",author:"王维",img:"https://picsum.photos/seed/18/800/400"},
+    {id:19,title:"望天门山",author:"李白",img:"https://picsum.photos/seed/19/800/400"},
+    {id:20,title:"夜雨寄北",author:"李商隐",img:"https://picsum.photos/seed/20/800/400"}
+];
+
+// 生成卡片
+const track = document.getElementById('track');
+poems.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'carousel-card';
+    card.dataset.id = p.id;
+    card.innerHTML = `
+        <img src="${p.img}" alt="${p.title}">
+        <div class="info">
+            <h3>${p.title}</h3>
+            <p>作者：${p.author}</p>
+        </div>
+    `;
+    card.addEventListener('click',()=>{ alert('点击进入详情页（ID:'+p.id+'）'); });
+    track.appendChild(card);
+});
+
+// Carousel logic
+let index = 0;
+const total = poems.length;
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function updateCarousel(){
+    const width = document.querySelector('.carousel').clientWidth;
+    track.style.transform = `translateX(${-index*width}px)`;
+}
+prevBtn.onclick = ()=>{ index = (index-1+total)%total; updateCarousel(); };
+nextBtn.onclick = ()=>{ index = (index+1)%total; updateCarousel(); };
+window.addEventListener('resize',updateCarousel);
+updateCarousel();
+
+// Search
+document.getElementById('searchBtn').addEventListener('click',()=>{ performSearch(); });
+document.getElementById('searchInput').addEventListener('keypress',e=>{ if(e.key==='Enter') performSearch(); });
+
+function performSearch(){
+    const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+    if(!kw){ alert('请输入搜索关键词'); return; }
+    const results = poems.filter(p=>p.title.includes(kw)||p.author.includes(kw));
+    if(results.length===0){
+        alert('未找到匹配的诗词');
+    }else{
+        const titles = results.map(p=>p.title+' - '+p.author).join('\\n');
+        alert('搜索结果:\\n'+titles);
+    }
+}
+
+// Quick links (placeholder)
+document.getElementById('dynastyLink').addEventListener('click',()=>{ alert('跳转到朝代筛选页'); });
+document.getElementById('authorLink').addEventListener('click',()=>{ alert('跳转到作者筛选页'); });
+document.getElementById('themeLink').addEventListener('click',()=>{ alert('跳转到主题筛选页'); });
+</script>
+</body>
+</html>
