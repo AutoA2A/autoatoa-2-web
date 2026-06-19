@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>诗词列表页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:#f5f5f5;color:#333;}
+header{background:#4a90e2;color:#fff;padding:1rem;text-align:center;}
+.container{display:flex;max-width:1200px;margin:1rem auto;padding:0 1rem;}
+.sidebar{flex:0 0 250px;background:#fff;padding:1rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1);}
+.sidebar h2{font-size:1.2rem;margin-bottom:.5rem;}
+.filter-group{margin-bottom:1rem;}
+.filter-group label{display:block;margin:.3rem 0;}
+.filter-group input[type="checkbox"]{margin-right:.5rem;}
+.main{flex:1;margin-left:1rem;}
+.poem-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;}
+.poem-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.1);display:flex;flex-direction:column;}
+.poem-card img{width:100%;height:150px;object-fit:cover;}
+.poem-card .content{padding:0.8rem;flex:1;display:flex;flex-direction:column;}
+.poem-card .title{font-weight:bold;font-size:1rem;margin-bottom:0.3rem;color:#2c3e50;}
+.poem-card .author{font-size:0.9rem;color:#7f8c8d;margin-bottom:0.5rem;}
+.poem-card .summary{flex:1;font-size:0.85rem;color:#555;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.pagination{margin:1rem 0;text-align:center;}
+.pagination button{margin:0 3px;padding:0.4rem 0.8rem;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;}
+.pagination button.active{background:#4a90e2;color:#fff;border-color:#4a90e2;}
+.pagination button:disabled{opacity:.5;cursor:not-allowed;}
+@media (max-width:768px){
+  .container{flex-direction:column;}
+  .sidebar{flex:0 0 auto;width:100%;margin-bottom:1rem;}
+  .main{margin-left:0;}
+}
+</style>
+<meta name="description" content="分页展示80首诗词，每项显示标题、作者、配图缩略图和一句摘要；支持左侧多选过滤器（朝代、作者、主题），过滤后即时刷新列表。"><meta name="keywords" content="古诗词,Web应用,诗词检索,诗词解析,古典文学,朝代筛选,作者分类,主题搜索"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:type" content="website"><meta property="og:title" content="诗词列表页"><meta property="og:description" content="分页展示80首诗词，每项显示标题、作者、配图缩略图和一句摘要；支持左侧多选过滤器（朝代、作者、主题），过滤后即时刷新列表。"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="诗词列表页"><meta name="twitter:description" content="分页展示80首诗词，每项显示标题、作者、配图缩略图和一句摘要；支持左侧多选过滤器（朝代、作者、主题），过滤后即时刷新列表。"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"诗词列表页","description":"分页展示80首诗词，每项显示标题、作者、配图缩略图和一句摘要；支持左侧多选过滤器（朝代、作者、主题），过滤后即时刷新列表。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script></head>
+<body>
+<header><h1>古诗词浏览与解析系统</h1></header>
+<div class="container">
+  <aside class="sidebar">
+    <h2>筛选</h2>
+    <div class="filter-group" id="dynasty-filter">
+      <strong>朝代</strong>
+    </div>
+    <div class="filter-group" id="author-filter">
+      <strong>作者</strong>
+    </div>
+    <div class="filter-group" id="theme-filter">
+      <strong>主题</strong>
+    </div>
+  </aside>
+  <section class="main">
+    <div class="poem-list" id="poem-list"></div>
+    <div class="pagination" id="pagination"></div>
+  </section>
+</div>
+
+<script>
+// 生成示例数据
+const dynasties = ["先秦","两汉","魏晋","南北朝","隋唐","五代","宋代","元代","明代","清代"];
+const themes = ["山水","田园","边塞","爱情","咏史","闺怨","送别","思乡"];
+function randomItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function generatePoems(count){
+  const poems=[];
+  for(let i=0;i<count;i++){
+    const dynasty=randomItem(dynasties);
+    const author=`${dynasty}诗人${i%10+1}`;
+    const title=`《诗篇${i+1}》`;
+    const theme=randomItem(themes);
+    const summary=`这是一首描写${theme}的古诗，意境悠远，情感深沉。`;
+    const img=`https://picsum.photos/seed/${i}/400/300`;
+    poems.push({id:i,title,author,dynasty,theme,summary,img});
+  }
+  return poems;
+}
+const allPoems=generatePoems(80);
+let filteredPoems=allPoems.slice();
+
+// 渲染过滤器
+function renderFilters(){
+  const dynSet=new Set(allPoems.map(p=>p.dynasty));
+  const authSet=new Set(allPoems.map(p=>p.author));
+  const themeSet=new Set(allPoems.map(p=>p.theme));
+  const createGroup=(container, items, name)=>{
+    container.innerHTML="";
+    items.forEach(val=>{
+      const id=`${name}-${val}`;
+      const label=document.createElement("label");
+      label.innerHTML=`<input type="checkbox" id="${id}" data-type="${name}" value="${val}"> ${val}`;
+      container.appendChild(label);
+    });
+  };
+  createGroup(document.getElementById("dynasty-filter"),Array.from(dynSet).sort(), "dynasty");
+  createGroup(document.getElementById("author-filter"),Array.from(authSet).sort(), "author");
+  createGroup(document.getElementById("theme-filter"),Array.from(themeSet).sort(), "theme");
+}
+renderFilters();
+
+// 过滤逻辑
+function applyFilters(){
+  const checked=document.querySelectorAll('.sidebar input[type="checkbox"]:checked');
+  const criteria={dynasty:[],author:[],theme:[]};
+  checked.forEach(cb=>{
+    criteria[cb.dataset.type].push(cb.value);
+  });
+  filteredPoems=allPoems.filter(p=>{
+    const dynOk=criteria.dynasty.length===0||criteria.dynasty.includes(p.dynasty);
+    const authOk=criteria.author.length===0||criteria.author.includes(p.author);
+    const themeOk=criteria.theme.length===0||criteria.theme.includes(p.theme);
+    return dynOk&&authOk&&themeOk;
+  });
+  currentPage=1;
+  renderList();
+}
+document.querySelectorAll('.sidebar input[type="checkbox"]').forEach(cb=>cb.addEventListener('change',applyFilters));
+
+// 分页
+let currentPage=1;
+const pageSize=12;
+function renderList(){
+  const listEl=document.getElementById("poem-list");
+  listEl.innerHTML="";
+  const start=(currentPage-1)*pageSize;
+  const pageItems=filteredPoems.slice(start,start+pageSize);
+  pageItems.forEach(p=>{
+    const card=document.createElement("div");
+    card.className="poem-card";
+    card.innerHTML=`
+      <img src="${p.img}" alt="${p.title}">
+      <div class="content">
+        <div class="title">${p.title}</div>
+        <div class="author">${p.author} · ${p.dynasty}</div>
+        <div class="summary">${p.summary}</div>
+      </div>
+    `;
+    listEl.appendChild(card);
+  });
+  renderPagination();
+}
+function renderPagination(){
+  const pagEl=document.getElementById("pagination");
+  pagEl.innerHTML="";
+  const totalPages=Math.ceil(filteredPoems.length/pageSize);
+  if(totalPages<=1) return;
+  const createBtn=(text,disabled,cls,handler)=>{
+    const btn=document.createElement("button");
+    btn.textContent=text;
+    btn.disabled=disabled;
+    if(cls) btn.className=cls;
+    btn.addEventListener('click',handler);
+    pagEl.appendChild(btn);
+  };
+  createBtn("«",currentPage===1,null,()=>{currentPage=1;renderList();});
+  createBtn("‹",currentPage===1,null,()=>{currentPage--;renderList();});
+  const maxShow=5;
+  let start=Math.max(1,currentPage-Math.floor(maxShow/2));
+  let end=Math.min(totalPages,start+maxShow-1);
+  if(end-start<maxShow-1) start=Math.max(1,end-maxShow+1);
+  for(let i=start;i<=end;i++){
+    createBtn(i,i===currentPage,"active",()=>{currentPage=i;renderList();});
+  }
+  createBtn("›",currentPage===totalPages,null,()=>{currentPage++;renderList();});
+  createBtn("»",currentPage===totalPages,null,()=>{currentPage=totalPages;renderList();});
+}
+renderList();
+</script>
+</body>
+</html>
