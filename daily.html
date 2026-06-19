@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>每日一诗</title>
+<style>
+  body{margin:0;font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;background:#f5f5f5;color:#333;}
+  .container{max-width:800px;margin:auto;padding:20px;box-sizing:border-box;}
+  .poem-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+  .poem-img{width:100%;height:200px;object-fit:cover;}
+  .poem-content{padding:20px;}
+  .poem-title{font-size:1.8em;margin:0 0 10px;}
+  .poem-author{font-size:1.2em;color:#777;margin-bottom:15px;}
+  .poem-analysis{font-size:1em;line-height:1.6;color:#444;}
+  .btn{display:inline-block;margin-top:20px;padding:10px 20px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:1em;}
+  .btn:hover{background:#0056b3;}
+  @media(max-width:480px){
+    .poem-img{height:150px;}
+    .poem-title{font-size:1.4em;}
+  }
+</style>
+<meta name="description" content="随机或按日期推荐一首诗，展示标题、作者、配图及简要赏析；提供“换一首”按钮刷新，点击可进入完整详情。"><meta name="keywords" content="古诗词,Web应用,诗词检索,诗词解析,古典文学,朝代筛选,作者分类,主题搜索"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:type" content="website"><meta property="og:title" content="每日一诗"><meta property="og:description" content="随机或按日期推荐一首诗，展示标题、作者、配图及简要赏析；提供“换一首”按钮刷新，点击可进入完整详情。"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="每日一诗"><meta name="twitter:description" content="随机或按日期推荐一首诗，展示标题、作者、配图及简要赏析；提供“换一首”按钮刷新，点击可进入完整详情。"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"每日一诗","description":"随机或按日期推荐一首诗，展示标题、作者、配图及简要赏析；提供“换一首”按钮刷新，点击可进入完整详情。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script></head>
+<body>
+<div class="container">
+  <div class="poem-card" id="poem-card">
+    <img src="" alt="诗歌配图" class="poem-img" id="poem-img">
+    <div class="poem-content">
+      <h1 class="poem-title" id="poem-title"></h1>
+      <h3 class="poem-author" id="poem-author"></h3>
+      <p class="poem-analysis" id="poem-analysis"></p>
+      <button class="btn" id="change-btn">换一首</button>
+      <button class="btn" id="detail-btn">查看完整详情</button>
+    </div>
+  </div>
+</div>
+<script>
+const poems = [
+  {
+    title:"静夜思",
+    author:"李白",
+    img:"https://images.unsplash.com/photo-1519682337058-072b5d1b8e9d?auto=format&fit=crop&w=800&q=80",
+    analysis:"诗人以简洁的语言描绘了夜晚的寂静与思乡之情，短短七言，情感却深远。"
+  },
+  {
+    title:"登鹳雀楼",
+    author:"王之涣",
+    img:"https://images.unsplash.com/photo-1526376010211-6a8c7d7e3c3f?auto=format&fit=crop&w=800&q=80",
+    analysis:"通过“白日依山尽，黄河入海流”的壮阔景象，表达了诗人对人生和宇宙的宏大感悟。"
+  },
+  {
+    title:"春晓",
+    author:"孟浩然",
+    img:"https://images.unsplash.com/photo-1502082553048-9e6a5b1e2a7e?auto=format&fit=crop&w=800&q=80",
+    analysis:"诗中描绘了春天的清晨，鸟语花香，抒发了诗人对自然的喜爱与宁静的向往。"
+  },
+  {
+    title:"黄鹤楼",
+    author:"崔颢",
+    img:"https://images.unsplash.com/photo-1521582363848-4b9f4e6b3c1f?auto=format&fit=crop&w=800&q=80",
+    analysis:"以黄鹤楼为背景，抒发了诗人对历史与人生的思考，诗句“昔人已乘黄鹤去”更添几分凄凉。"
+  },
+  {
+    title:"将进酒",
+    author:"李白",
+    img:"https://images.unsplash.com/photo-1519620469072-5d3a6f7c1b3e?auto=format&fit=crop&w=800&q=80",
+    analysis:"诗人以豪放的笔调劝酒，借酒浇愁，表达了对人生短暂与自由的豪情。"
+  }
+];
+
+function getPoemIndex(){
+  const date = new Date();
+  const day = date.getDate();
+  return day % poems.length;
+}
+
+function displayPoem(idx){
+  const p = poems[idx];
+  document.getElementById('poem-img').src = p.img;
+  document.getElementById('poem-title').textContent = p.title;
+  document.getElementById('poem-author').textContent = p.author;
+  document.getElementById('poem-analysis').textContent = p.analysis;
+}
+
+document.getElementById('change-btn').addEventListener('click',()=>{
+  const idx = Math.floor(Math.random()*poems.length);
+  displayPoem(idx);
+});
+
+document.getElementById('detail-btn').addEventListener('click',()=>{
+  const idx = Math.floor(Math.random()*poems.length);
+  const p = poems[idx];
+  alert(`标题：${p.title}\n作者：${p.author}\n\n完整赏析：\n${p.analysis}\n\n（此为示例，完整内容可在专页查看）`);
+});
+
+window.onload = () => {
+  const idx = getPoemIndex();
+  displayPoem(idx);
+};
+</script>
+</body>
+</html>
